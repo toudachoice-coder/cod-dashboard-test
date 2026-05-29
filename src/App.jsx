@@ -1,216 +1,513 @@
 import { useMemo, useState } from 'react'
 
+const TODAY = new Date('2026-05-29T12:00:00')
+
 const ordersData = [
   {
-    order_id: 'CMD-1001',
-    source: 'Facebook Ads',
-    date_commande: '2026-05-20',
-    client_name: 'Youssef El Amrani',
+    order_id: 'CM-2031',
+    source: 'Celia Mode 2026',
+    date_commande: '2026-05-29T09:20:00',
+    client_name: 'Salma El Harrak',
     phone: '0612345678',
     city: 'Casablanca',
-    product: 'Smart Watch X1',
-    price: 499,
-    statut_interne: 'New',
+    product: 'Verrou fenêtre coulissante - Pack 2',
+    price: 139,
+    statut_interne: '',
     code_colis: '',
-    statut_livraison: 'Pending',
+    statut_livraison: '',
   },
   {
-    order_id: 'CMD-1002',
-    source: 'TikTok Shop',
-    date_commande: '2026-05-19',
-    client_name: 'Salma Benali',
-    phone: '0678899001',
+    order_id: 'CM-2030',
+    source: 'Celia Mode 2026',
+    date_commande: '2026-05-28T18:45:00',
+    client_name: 'Nadia Benkirane',
+    phone: '0661122334',
     city: 'Rabat',
-    product: 'Mini Blender',
-    price: 299,
-    statut_interne: 'Confirmed',
-    code_colis: 'CLS900122',
-    statut_livraison: 'In transit',
+    product: 'Clé USB Quran',
+    price: 199,
+    statut_interne: 'Confirmé',
+    code_colis: '',
+    statut_livraison: '',
   },
   {
-    order_id: 'CMD-1003',
-    source: 'Instagram',
-    date_commande: '2026-05-18',
-    client_name: 'Mohamed Ait Taleb',
-    phone: '0655544433',
+    order_id: 'NY-1108',
+    source: 'New Year',
+    date_commande: '2026-05-28T14:15:00',
+    client_name: 'Yassine Amrani',
+    phone: '0700112233',
     city: 'Marrakech',
-    product: 'Portable Vacuum',
-    price: 379,
-    statut_interne: 'Without tracking code',
+    product: 'Verrou fenêtre coulissante - Pack 4',
+    price: 199,
+    statut_interne: 'Confirmé',
+    code_colis: 'SDT-805533',
+    statut_livraison: 'En transit',
+  },
+  {
+    order_id: 'W2033',
+    source: 'WhatsApp',
+    date_commande: '2026-05-27T21:10:00',
+    client_name: 'Khadija Mansouri',
+    phone: '0677008899',
+    city: 'Tanger',
+    product: 'Celia Shoes - Noir',
+    price: 249,
+    statut_interne: 'À rappeler',
     code_colis: '',
-    statut_livraison: 'Pending',
+    statut_livraison: '',
   },
   {
-    order_id: 'CMD-1004',
-    source: 'Website',
-    date_commande: '2026-05-17',
-    client_name: 'Imane Ouali',
-    phone: '0622233344',
-    city: 'Fes',
-    product: 'Hair Curler Pro',
-    price: 420,
-    statut_interne: 'Delivered',
-    code_colis: 'CLS123498',
-    statut_livraison: 'Delivered',
+    order_id: 'CM-2029',
+    source: 'Celia Mode 2026',
+    date_commande: '2026-05-27T11:05:00',
+    client_name: 'Oumaima Fassi',
+    phone: '0655667788',
+    city: 'Fès',
+    product: 'Crème solaire Azayko',
+    price: 159,
+    statut_interne: 'Confirmé',
+    code_colis: 'SDT-804221',
+    statut_livraison: 'Livré',
   },
   {
-    order_id: 'CMD-1005',
-    source: 'Call Center',
-    date_commande: '2026-05-16',
-    client_name: 'Omar Idrissi',
-    phone: '0688765432',
+    order_id: 'CM-2028',
+    source: 'Celia Mode 2026',
+    date_commande: '2026-05-26T17:35:00',
+    client_name: 'Siham Jebari',
+    phone: '0600456789',
     city: 'Agadir',
-    product: 'Massage Gun',
-    price: 599,
-    statut_interne: 'Canceled',
-    code_colis: '',
-    statut_livraison: 'Canceled',
+    product: 'Sérum visage',
+    price: 189,
+    statut_interne: 'Confirmé',
+    code_colis: 'SDT-803908',
+    statut_livraison: 'Injoignable',
   },
   {
-    order_id: 'CMD-1006',
-    source: 'Facebook Ads',
-    date_commande: '2026-05-21',
-    client_name: 'Nadia Chraibi',
-    phone: '0600112233',
-    city: 'Tangier',
-    product: 'Kitchen Scale',
-    price: 189,
-    statut_interne: 'Confirmed',
-    code_colis: 'CLS662244',
-    statut_livraison: 'Shipped',
+    order_id: 'NY-1107',
+    source: 'New Year',
+    date_commande: '2026-05-26T10:55:00',
+    client_name: 'Meriem Ait Lahcen',
+    phone: '0699887766',
+    city: 'Oujda',
+    product: 'Verrou fenêtre coulissante - Pack 2',
+    price: 139,
+    statut_interne: 'Non intéressé',
+    code_colis: '',
+    statut_livraison: '',
+  },
+  {
+    order_id: 'W2032',
+    source: 'WhatsApp',
+    date_commande: '2026-05-25T15:40:00',
+    client_name: 'Hajar El Idrissi',
+    phone: '0622554411',
+    city: 'Kénitra',
+    product: 'Clé USB Quran',
+    price: 199,
+    statut_interne: 'Confirmé',
+    code_colis: 'SDT-803512',
+    statut_livraison: 'Reporté',
+  },
+  {
+    order_id: 'CM-2027',
+    source: 'Celia Mode 2026',
+    date_commande: '2026-05-25T12:10:00',
+    client_name: 'Imane Alaoui',
+    phone: '0711223344',
+    city: 'Meknès',
+    product: 'Celia Shoes - Caramel',
+    price: 249,
+    statut_interne: 'Confirmé',
+    code_colis: 'SDT-802977',
+    statut_livraison: 'Refusé',
+  },
+  {
+    order_id: 'NY-1106',
+    source: 'New Year',
+    date_commande: '2026-05-24T19:20:00',
+    client_name: 'Asmaa Berrada',
+    phone: '0619876543',
+    city: 'Mohammedia',
+    product: 'Verrou fenêtre coulissante - Pack 4',
+    price: 199,
+    statut_interne: 'Confirmé',
+    code_colis: 'SDT-801644',
+    statut_livraison: 'Annulé',
+  },
+  {
+    order_id: 'CM-2026',
+    source: 'Celia Mode 2026',
+    date_commande: '2026-05-24T09:00:00',
+    client_name: 'Fatima Zahra',
+    phone: '0666001122',
+    city: 'El Jadida',
+    product: 'Crème solaire Azayko',
+    price: 159,
+    statut_interne: 'Confirmé',
+    code_colis: 'SDT-800914',
+    statut_livraison: 'Entrepôt',
+  },
+  {
+    order_id: 'W2031',
+    source: 'WhatsApp',
+    date_commande: '2026-05-23T22:05:00',
+    client_name: 'Rania Bennani',
+    phone: '0633445566',
+    city: 'Salé',
+    product: 'Celia Shoes - Beige',
+    price: 249,
+    statut_interne: 'Confirmé',
+    code_colis: '',
+    statut_livraison: '',
   },
 ]
 
-const statuses = ['All', 'New', 'Confirmed', 'Without tracking code', 'Delivered', 'Canceled']
-const sources = ['All', ...new Set(ordersData.map((order) => order.source))]
+const internalFilters = [
+  { key: 'all', label: 'Tous', icon: '📋' },
+  { key: 'new', label: 'Nouvelles', icon: '🆕' },
+  { key: 'callback', label: 'À rappeler', icon: '📞' },
+  { key: 'notInterested', label: 'Non intéressé', icon: '❌' },
+  { key: 'confirmedToSend', label: 'Confirmées à envoyer', icon: '✅' },
+  { key: 'withoutCode', label: 'Sans code colis', icon: '🏷️' },
+]
+
+const deliveryFilters = [
+  { key: 'warehouse', label: 'Entrepôt', icon: '🏬' },
+  { key: 'transit', label: 'En transit', icon: '🚚' },
+  { key: 'delivered', label: 'Livrées', icon: '🎉' },
+  { key: 'refused', label: 'Refusées', icon: '⛔' },
+  { key: 'canceled', label: 'Annulées', icon: '❌' },
+  { key: 'unreachable', label: 'Injoignables', icon: '☎️' },
+  { key: 'postponed', label: 'Reportées', icon: '⏳' },
+]
+
+const sources = ['Toutes les sources', 'Celia Mode 2026', 'New Year', 'WhatsApp']
+
+function normalize(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+function isConfirmed(order) {
+  const status = normalize(order.statut_interne)
+  return ['confirme', 'confirmed'].includes(status)
+}
+
+function hasNoCode(order) {
+  return !String(order.code_colis || '').trim()
+}
+
+function isNewOrder(order) {
+  const hours = (TODAY - new Date(order.date_commande)) / 36e5
+  return !order.statut_interne && hours <= 24
+}
+
+function matchesFilter(order, filter) {
+  const internal = normalize(order.statut_interne)
+  const delivery = normalize(order.statut_livraison)
+
+  switch (filter) {
+    case 'all':
+      return true
+    case 'new':
+      return isNewOrder(order)
+    case 'callback':
+      return internal.includes('rappeler')
+    case 'notInterested':
+      return internal.includes('non interesse')
+    case 'confirmedToSend':
+      return isConfirmed(order) && hasNoCode(order)
+    case 'withoutCode':
+      return hasNoCode(order)
+    case 'warehouse':
+      return delivery.includes('entrepot')
+    case 'transit':
+      return delivery.includes('transit')
+    case 'delivered':
+      return delivery.includes('livre')
+    case 'refused':
+      return delivery.includes('refuse')
+    case 'canceled':
+      return delivery.includes('annule')
+    case 'unreachable':
+      return delivery.includes('injoignable')
+    case 'postponed':
+      return delivery.includes('reporte')
+    default:
+      return true
+  }
+}
+
+function getStatus(order) {
+  if (isNewOrder(order)) return { label: 'New', tone: 'new' }
+  if (isConfirmed(order) && hasNoCode(order)) return { label: 'Confirmée à envoyer', tone: 'warning' }
+  if (normalize(order.statut_interne).includes('rappeler')) return { label: 'À rappeler', tone: 'info' }
+  if (normalize(order.statut_interne).includes('non interesse')) return { label: 'Non intéressé', tone: 'danger' }
+  if (order.statut_livraison) return { label: order.statut_livraison, tone: deliveryTone(order.statut_livraison) }
+  if (isConfirmed(order)) return { label: 'Confirmée', tone: 'success' }
+  return { label: 'Non traité', tone: 'muted' }
+}
+
+function deliveryTone(status) {
+  const value = normalize(status)
+  if (value.includes('livre')) return 'success'
+  if (value.includes('annule') || value.includes('refuse')) return 'danger'
+  if (value.includes('injoignable') || value.includes('reporte')) return 'warning'
+  if (value.includes('transit')) return 'info'
+  return 'muted'
+}
+
+function money(value) {
+  return `${value.toLocaleString('fr-MA')} DH`
+}
+
+function formatDate(value) {
+  return new Intl.DateTimeFormat('fr-MA', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
+}
+
+function whatsappLink(order) {
+  const phone = order.phone.replace(/\D/g, '').replace(/^0/, '212')
+  const message = encodeURIComponent(
+    `Salam ${order.client_name}, concernant votre commande ${order.order_id} (${order.product}), pouvez-vous confirmer l'adresse svp ?`,
+  )
+  return `https://wa.me/${phone}?text=${message}`
+}
+
+function callLink(order) {
+  return `tel:${order.phone}`
+}
 
 function App() {
-  const [statusFilter, setStatusFilter] = useState('All')
-  const [sourceFilter, setSourceFilter] = useState('All')
+  const [activeFilter, setActiveFilter] = useState('all')
+  const [sourceFilter, setSourceFilter] = useState('Toutes les sources')
   const [search, setSearch] = useState('')
 
   const filteredOrders = useMemo(() => {
-    const query = search.toLowerCase().trim()
+    const query = normalize(search)
 
     return ordersData.filter((order) => {
-      const matchStatus = statusFilter === 'All' || order.statut_interne === statusFilter
-      const matchSource = sourceFilter === 'All' || order.source === sourceFilter
-      const matchSearch =
+      const sourceOk = sourceFilter === 'Toutes les sources' || order.source === sourceFilter
+      const filterOk = matchesFilter(order, activeFilter)
+      const searchOk =
         !query ||
-        order.phone.toLowerCase().includes(query) ||
-        order.client_name.toLowerCase().includes(query)
+        normalize(order.client_name).includes(query) ||
+        normalize(order.phone).includes(query) ||
+        normalize(order.city).includes(query) ||
+        normalize(order.order_id).includes(query) ||
+        normalize(order.product).includes(query)
 
-      return matchStatus && matchSource && matchSearch
+      return sourceOk && filterOk && searchOk
     })
-  }, [search, sourceFilter, statusFilter])
+  }, [activeFilter, search, sourceFilter])
 
   const stats = useMemo(() => {
     const total = ordersData.length
-    const confirmed = ordersData.filter((o) => o.statut_interne === 'Confirmed').length
-    const withoutTracking = ordersData.filter((o) => !o.code_colis).length
-    const delivered = ordersData.filter((o) => o.statut_interne === 'Delivered').length
-    const canceled = ordersData.filter((o) => o.statut_interne === 'Canceled').length
+    const confirmedToSend = ordersData.filter((order) => isConfirmed(order) && hasNoCode(order)).length
+    const withoutCode = ordersData.filter(hasNoCode).length
+    const delivered = ordersData.filter((order) => matchesFilter(order, 'delivered')).length
+    const canceled = ordersData.filter((order) => matchesFilter(order, 'canceled')).length
+    const deliveredRevenue = ordersData
+      .filter((order) => matchesFilter(order, 'delivered'))
+      .reduce((sum, order) => sum + order.price, 0)
 
-    return { total, confirmed, withoutTracking, delivered, canceled }
+    const confirmedCelia = ordersData.filter(
+      (order) => order.source === 'Celia Mode 2026' && isConfirmed(order),
+    ).length
+    const deliveredCelia = ordersData.filter(
+      (order) => order.source === 'Celia Mode 2026' && matchesFilter(order, 'delivered'),
+    ).length
+    const deliveryRate = confirmedCelia ? Math.round((deliveredCelia / confirmedCelia) * 100) : 0
+
+    return { total, confirmedToSend, withoutCode, delivered, canceled, deliveredRevenue, deliveryRate }
   }, [])
 
   return (
-    <main className="container">
-      <header className="header">
-        <h1>Morocco COD Dashboard</h1>
-        <p>Sample data only — no API or Google Sheets connection.</p>
-      </header>
-
-      <section className="cards">
-        <StatCard title="Total orders" value={stats.total} />
-        <StatCard title="Confirmed orders" value={stats.confirmed} />
-        <StatCard title="Orders without tracking code" value={stats.withoutTracking} />
-        <StatCard title="Delivered orders" value={stats.delivered} />
-        <StatCard title="Canceled orders" value={stats.canceled} />
+    <main className="app-shell">
+      <section className="hero-card">
+        <div>
+          <p className="eyebrow">Celia COD Manager · V2</p>
+          <h1>Dashboard COD</h1>
+          <p className="subtitle">Suivi mobile-first des commandes, confirmations et colis Sendit.</p>
+        </div>
+        <div className="sync-pill">
+          <span>Dernier sync</span>
+          <strong>29 mai · 12:00</strong>
+        </div>
       </section>
 
-      <section className="filters">
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-          {statuses.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
+      <section className="stats-grid" aria-label="Statistiques COD">
+        <StatCard icon="📦" label="Total commandes" value={stats.total} />
+        <StatCard icon="✅" label="Confirmées à envoyer" value={stats.confirmedToSend} accent />
+        <StatCard icon="🏷️" label="Sans code colis" value={stats.withoutCode} />
+        <StatCard icon="🎉" label="Livrées" value={stats.delivered} />
+        <StatCard icon="❌" label="Annulées" value={stats.canceled} />
+        <StatCard icon="💰" label="CA livré" value={money(stats.deliveredRevenue)} />
+      </section>
 
-        <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}>
-          {sources.map((source) => (
-            <option key={source} value={source}>
-              {source}
-            </option>
-          ))}
-        </select>
+      <section className="rate-card">
+        <div>
+          <span>Taux livraison · Celia Mode 2026</span>
+          <strong>{stats.deliveryRate}%</strong>
+        </div>
+        <div className="progress-bar">
+          <span style={{ width: `${stats.deliveryRate}%` }} />
+        </div>
+      </section>
 
-        <input
-          type="search"
-          placeholder="Search by phone or client name"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      <section className="control-panel">
+        <div className="field">
+          <label htmlFor="search">Recherche</label>
+          <input
+            id="search"
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Nom, téléphone, ville, produit..."
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="source">Source</label>
+          <select id="source" value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}>
+            {sources.map((source) => (
+              <option key={source} value={source}>
+                {source}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <FilterGroup
+          title="Groupe 1 — Interne"
+          filters={internalFilters}
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+        />
+
+        <FilterGroup
+          title="Groupe 2 — Sendit"
+          filters={deliveryFilters}
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
         />
       </section>
 
-      <section className="table-card">
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>order_id</th>
-                <th>source</th>
-                <th>date_commande</th>
-                <th>client_name</th>
-                <th>phone</th>
-                <th>city</th>
-                <th>product</th>
-                <th>price</th>
-                <th>statut_interne</th>
-                <th>code_colis</th>
-                <th>statut_livraison</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.order_id}>
-                  <td>{order.order_id}</td>
-                  <td>{order.source}</td>
-                  <td>{order.date_commande}</td>
-                  <td>{order.client_name}</td>
-                  <td>{order.phone}</td>
-                  <td>{order.city}</td>
-                  <td>{order.product}</td>
-                  <td>{order.price} MAD</td>
-                  <td>
-                    <span className={`badge badge-${toBadgeClass(order.statut_interne)}`}>
-                      {order.statut_interne}
-                    </span>
-                  </td>
-                  <td>{order.code_colis || '-'}</td>
-                  <td>{order.statut_livraison}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <section className="orders-heading">
+        <div>
+          <p className="eyebrow">Commandes</p>
+          <h2>{filteredOrders.length} affichées</h2>
         </div>
+        <button
+          type="button"
+          className="reset-button"
+          onClick={() => {
+            setActiveFilter('all')
+            setSourceFilter('Toutes les sources')
+            setSearch('')
+          }}
+        >
+          Reset
+        </button>
+      </section>
+
+      <section className="orders-list">
+        {filteredOrders.map((order) => (
+          <OrderCard key={order.order_id} order={order} />
+        ))}
       </section>
     </main>
   )
 }
 
-function StatCard({ title, value }) {
+function StatCard({ icon, label, value, accent = false }) {
   return (
-    <article className="card">
-      <p>{title}</p>
-      <h2>{value}</h2>
+    <article className={accent ? 'stat-card accent' : 'stat-card'}>
+      <span className="stat-icon">{icon}</span>
+      <p>{label}</p>
+      <strong>{value}</strong>
     </article>
   )
 }
 
-function toBadgeClass(status) {
-  return status.toLowerCase().replaceAll(' ', '-').replaceAll('_', '-')
+function FilterGroup({ title, filters, activeFilter, setActiveFilter }) {
+  return (
+    <div className="filter-group">
+      <h3>{title}</h3>
+      <div className="chips">
+        {filters.map((filter) => (
+          <button
+            key={filter.key}
+            type="button"
+            className={activeFilter === filter.key ? 'chip active' : 'chip'}
+            onClick={() => setActiveFilter(filter.key)}
+          >
+            <span>{filter.icon}</span>
+            {filter.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function OrderCard({ order }) {
+  const status = getStatus(order)
+
+  return (
+    <article className="order-card">
+      <div className="order-top">
+        <div>
+          <strong>{order.order_id}</strong>
+          <span>{formatDate(order.date_commande)}</span>
+        </div>
+        <span className={`badge ${status.tone}`}>{status.label}</span>
+      </div>
+
+      <div className="client-row">
+        <div>
+          <h3>{order.client_name}</h3>
+          <p>
+            {order.city} · {order.source}
+          </p>
+        </div>
+        <strong>{money(order.price)}</strong>
+      </div>
+
+      <p className="product-line">{order.product}</p>
+
+      <div className="meta-grid">
+        <div>
+          <span>Téléphone</span>
+          <strong>{order.phone}</strong>
+        </div>
+        <div>
+          <span>Code colis</span>
+          <strong>{order.code_colis || 'Sans code'}</strong>
+        </div>
+        <div>
+          <span>Livraison</span>
+          <strong>{order.statut_livraison || 'Pas encore envoyé'}</strong>
+        </div>
+      </div>
+
+      <div className="actions">
+        <a className="whatsapp" href={whatsappLink(order)} target="_blank" rel="noreferrer">
+          WhatsApp
+        </a>
+        <a className="call" href={callLink(order)}>
+          Appeler
+        </a>
+        <button type="button">View</button>
+      </div>
+    </article>
+  )
 }
 
 export default App
