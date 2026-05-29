@@ -288,6 +288,7 @@ function App() {
   const [activeFilter, setActiveFilter] = useState('all')
   const [sourceFilter, setSourceFilter] = useState('Toutes les sources')
   const [search, setSearch] = useState('')
+  const [selectedOrder, setSelectedOrder] = useState(null)
 
   const filteredOrders = useMemo(() => {
     const query = normalize(search)
@@ -328,11 +329,42 @@ function App() {
     return { total, confirmedToSend, withoutCode, delivered, canceled, deliveredRevenue, deliveryRate }
   }, [])
 
+  const sourceStats = useMemo(() => {
+    return sources
+      .filter((source) => source !== 'Toutes les sources')
+      .map((source) => {
+        const orders = ordersData.filter((order) => order.source === source)
+        const delivered = orders.filter((order) => matchesFilter(order, 'delivered')).length
+        const confirmed = orders.filter(isConfirmed).length
+        const rate = confirmed ? Math.round((delivered / confirmed) * 100) : 0
+        return { source, total: orders.length, confirmed, delivered, rate }
+      })
+  }, [])
+
+  const cityStats = useMemo(() => {
+    const cityMap = ordersData.reduce((acc, order) => {
+      acc[order.city] = (acc[order.city] || 0) + 1
+      return acc
+    }, {})
+
+    return Object.entries(cityMap)
+      .map(([city, total]) => ({ city, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5)
+  }, [])
+
+  const priorityItems = [
+    { label: 'À envoyer', value: stats.confirmedToSend, filter: 'confirmedToSend', tone: 'violet' },
+    { label: 'Sans code', value: stats.withoutCode, filter: 'withoutCode', tone: 'amber' },
+    { label: 'À rappeler', value: ordersData.filter((order) => matchesFilter(order, 'callback')).length, filter: 'callback', tone: 'blue' },
+    { label: 'Injoignables', value: ordersData.filter((order) => matchesFilter(order, 'unreachable')).length, filter: 'unreachable', tone: 'red' },
+  ]
+
   return (
     <main className="app-shell">
       <section className="hero-card">
         <div>
-          <p className="eyebrow">Celia COD Manager · V2</p>
+          <p className="eyebrow">Celia COD Manager · V3</p>
           <h1>Dashboard COD</h1>
           <p className="subtitle">Suivi mobile-first des commandes, confirmations et colis Sendit.</p>
         </div>
@@ -340,6 +372,20 @@ function App() {
           <span>Dernier sync</span>
           <strong>29 mai · 12:00</strong>
         </div>
+      </section>
+
+      <section className="priority-grid" aria-label="Actions prioritaires">
+        {priorityItems.map((item) => (
+          <button
+            key={item.label}
+            type="button"
+            className={`priority-card ${item.tone}`}
+            onClick={() => setActiveFilter(item.filter)}
+          >
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+          </button>
+        ))}
       </section>
 
       <section className="stats-grid" aria-label="Statistiques COD">
@@ -351,13 +397,51 @@ function App() {
         <StatCard icon="💰" label="CA livré" value={money(stats.deliveredRevenue)} />
       </section>
 
-      <section className="rate-card">
-        <div>
-          <span>Taux livraison · Celia Mode 2026</span>
-          <strong>{stats.deliveryRate}%</strong>
+      <section className="insights-grid">
+        <div className="rate-card">
+          <div>
+            <span>Taux livraison · Celia Mode 2026</span>
+            <strong>{stats.deliveryRate}%</strong>
+          </div>
+          <div className="progress-bar">
+            <span style={{ width: `${stats.deliveryRate}%` }} />
+          </div>
         </div>
-        <div className="progress-bar">
-          <span style={{ width: `${stats.deliveryRate}%` }} />
+
+        <div className="mini-panel">
+          <div className="panel-title">
+            <span>Performance par source</span>
+            <strong>{ordersData.length} orders</strong>
+          </div>
+          <div className="source-list">
+            {sourceStats.map((item) => (
+              <button
+                key={item.source}
+                type="button"
+                className="source-row"
+                onClick={() => setSourceFilter(item.source)}
+              >
+                <span>{item.source}</span>
+                <strong>{item.total}</strong>
+                <em>{item.rate}% livré</em>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mini-panel city-panel">
+          <div className="panel-title">
+            <span>Top villes</span>
+            <strong>{cityStats.length}</strong>
+          </div>
+          <div className="city-list">
+            {cityStats.map((item) => (
+              <button key={item.city} type="button" onClick={() => setSearch(item.city)}>
+                <span>{item.city}</span>
+                <strong>{item.total}</strong>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -419,9 +503,11 @@ function App() {
 
       <section className="orders-list">
         {filteredOrders.map((order) => (
-          <OrderCard key={order.order_id} order={order} />
+          <OrderCard key={order.order_id} order={order} onView={() => setSelectedOrder(order)} />
         ))}
       </section>
+
+      {selectedOrder && <OrderModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
     </main>
   )
 }
@@ -457,7 +543,7 @@ function FilterGroup({ title, filters, activeFilter, setActiveFilter }) {
   )
 }
 
-function OrderCard({ order }) {
+function OrderCard({ order, onView }) {
   const status = getStatus(order)
 
   return (
@@ -504,9 +590,66 @@ function OrderCard({ order }) {
         <a className="call" href={callLink(order)}>
           Appeler
         </a>
-        <button type="button">View</button>
+        <button type="button" onClick={onView}>
+          View
+        </button>
       </div>
     </article>
+  )
+}
+
+function OrderModal({ order, onClose }) {
+  const status = getStatus(order)
+
+  return (
+    <div className="modal-backdrop" role="presentation" onClick={onClose}>
+      <section className="order-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+        <div className="modal-head">
+          <div>
+            <p className="eyebrow">Détails commande</p>
+            <h2>{order.order_id}</h2>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Fermer">
+            ×
+          </button>
+        </div>
+
+        <span className={`badge ${status.tone}`}>{status.label}</span>
+
+        <div className="details-list">
+          <DetailLine label="Client" value={order.client_name} />
+          <DetailLine label="Téléphone" value={order.phone} />
+          <DetailLine label="Ville" value={order.city} />
+          <DetailLine label="Source" value={order.source} />
+          <DetailLine label="Produit" value={order.product} />
+          <DetailLine label="Prix" value={money(order.price)} />
+          <DetailLine label="Date" value={formatDate(order.date_commande)} />
+          <DetailLine label="Code colis" value={order.code_colis || 'Sans code'} />
+          <DetailLine label="Livraison" value={order.statut_livraison || 'Pas encore envoyé'} />
+        </div>
+
+        <div className="actions modal-actions">
+          <a className="whatsapp" href={whatsappLink(order)} target="_blank" rel="noreferrer">
+            WhatsApp
+          </a>
+          <a className="call" href={callLink(order)}>
+            Appeler
+          </a>
+          <button type="button" onClick={onClose}>
+            Fermer
+          </button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function DetailLine({ label, value }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   )
 }
 
